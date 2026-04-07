@@ -1,105 +1,134 @@
-# EmberForge Threat Hunt: Active Directory Attack Investigation
+# EmberForge Threat Hunt
 
-This repository is a breakdown of a threat hunt I completed in Microsoft Sentinel for the **EmberForge: Source Leak** investigation. The scenario followed an attacker moving through an environment, stealing credentials, moving laterally, staging data, exfiltrating files, and establishing persistence.
-
-I worked through all 10 phases of the hunt and solved all 44 flags. The goal of this repo is to show how I used KQL, process telemetry, event logs, and host level evidence to piece the attack together. 
-
-## Environment
-
-- SIEM: Microsoft Sentinel  
-- Data: Sysmon + Windows Event Logs  
-- Log Source: EmberForgeX_CL  
-- Hosts:
-  - EC2AMAZ-B9GHHO6 (workstation)
-  - EC2AMAZ-16V3AU4 (server)
-  - EC2AMAZ-EEU3IA2 (domain controller)
+Simulated threat hunt using Microsoft Sentinel focused on identifying an Active Directory compromise, credential access, lateral movement, and data exfiltration.
 
 ---
 
-## What happened (attack chain)
+## What happened (quick summary)
 
-The attacker:
+- Initial access via malicious download using certutil  
+- Payload execution and persistence established  
+- Credentials dumped from LSASS  
+- Lateral movement across domain systems  
+- Data staged and exfiltrated using rclone to MEGA  
 
-- downloaded payload using certutil  
-- executed via rundll32 and suspicious processes  
-- dumped LSASS to steal credentials  
-- enumerated users  
-- moved laterally using SMB + net use  
-- staged data using compression tools  
-- exfiltrated using rclone to Mega  
-- created account for persistence  
-- installed remote access tool  
-- deleted shadow copies to evade detection  
+This simulates a full Active Directory compromise from initial access to exfiltration.
 
 ---
 
-## Key evidence
+## Attack Overview
 
-### Initial access + execution
-![Initial Access](./TH01_initial_certutil_download.jpeg)
-![Execution](./TH01_exec_rundll32_chain.jpeg)
+High level view of the investigation scope and activity timeline:
 
-- certutil used for payload delivery  
-- rundll32 used for execution  
+![Attack Overview](images/TH01_overview_attack_scope.jpeg)
 
 ---
 
-### Credential access
-![LSASS Dump](./TH01_cred_lsass_dump.jpeg)
+## Initial Access + Execution
 
-- LSASS dump confirms credential theft  
+Payload retrieved and executed using built in Windows utilities and suspicious process chains.
 
----
+Certutil used to download payload:
 
-### Lateral movement
-![Lateral Movement](./TH01_lat_net_use_auth.jpeg)
+![Certutil Download](images/TH01_initial_certutil_download.jpeg)
 
-- net use + SMB used to move between hosts  
+Payload execution observed:
 
----
+![Payload Execution](images/TH01_initial_payload_execution.jpeg)
 
-### Exfiltration
-![Exfil](./TH01_exfil_rclone_execution.jpeg)
+Suspicious rundll32 execution chain:
 
-- rclone used to send data externally  
-- traffic tied to Mega infrastructure  
+![Rundll32 Execution](images/TH01_exec_rundll32_chain.jpeg)
 
----
+Process tree showing abnormal behavior:
 
-### Persistence
-![Persistence](./TH01_persist_account_creation.jpeg)
-
-- account created + remote access established  
+![Process Tree](images/TH01_exec_suspicious_process_tree.jpeg)
 
 ---
 
-### Defense evasion
-![Evasion](./TH01_evasion_shadow_copy_delete.jpeg)
+## Credential Access
 
-- shadow copies deleted to reduce recovery  
+Credential dumping activity identified through LSASS access and memory artifacts.
 
----
+LSASS dump activity:
 
-## How I approached it
+![LSASS Dump](images/TH01_cred_lsass_dump.jpeg)
 
-- filtered process creation (EventCode 1)  
-- searched command lines (certutil, rclone, net use, vssadmin, rundll32)  
-- pivoted across hosts  
-- rebuilt timeline using timestamps  
+Sensitive process access tied to credential theft:
+
+![Sensitive Process Access](images/TH01_cred_sensitive_process_access.jpeg)
 
 ---
 
-## What this shows
+## Lateral Movement
 
-- ability to hunt using KQL  
-- ability to follow attacker behavior across systems  
-- understanding of real attack chains  
-- ability to separate signal from noise  
+Authentication and system access expanded across the environment.
+
+Net use authentication activity:
+
+![Net Use Auth](images/TH01_lat_net_use_auth.jpeg)
+
+Remote file copy between systems:
+
+![Remote Copy](images/TH01_lat_remote_copy.jpeg)
+
+Shared resource access:
+
+![Share Access](images/TH01_lat_share_access.jpeg)
 
 ---
 
-## Final note
+## Staging + Exfiltration
 
-This was one of the better hands on investigations I’ve worked through because it forced me to do more than just identify single events. I had to follow the attack from host to host, understand what mattered, and connect everything back into one timeline.
+Data prepared locally and exfiltrated using external tooling.
 
-That was the real value of it.
+Data staging and preparation:
+
+![Data Prep](images/TH01_stage_data_preparation.jpeg)
+
+Archive creation prior to exfiltration:
+
+![Archive Creation](images/TH01_stage_archive_creation.jpeg)
+
+Rclone execution for data transfer:
+
+![Rclone Execution](images/TH01_exfil_rclone_execution.jpeg)
+
+Connection to MEGA infrastructure:
+
+![Mega Connection](images/TH01_exfil_mega_connection.jpeg)
+
+---
+
+## Persistence
+
+Mechanisms established to maintain access.
+
+Account creation for persistence:
+
+![Account Creation](images/TH01_persist_account_creation.jpeg)
+
+Remote access tooling deployed:
+
+![Remote Access Tool](images/TH01_persist_remote_access_tool.jpeg)
+
+---
+
+## Key Findings
+
+- Domain compromise achieved  
+- Credentials successfully extracted from LSASS  
+- Multiple systems accessed through lateral movement  
+- Data exfiltrated to external infrastructure (MEGA)  
+- Persistence established via account creation and remote tooling  
+
+Attack chain reflects common real world adversary behavior across enterprise environments.
+
+---
+
+## Tools + Skills Used
+
+- Microsoft Sentinel (KQL)  
+- Log analysis and correlation  
+- Threat hunting methodology  
+- Understanding of attacker TTPs (execution, credential access, lateral movement, exfiltration)  
