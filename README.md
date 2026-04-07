@@ -2,133 +2,103 @@
 
 Simulated threat hunt using Microsoft Sentinel focused on identifying an Active Directory compromise, credential access, lateral movement, and data exfiltration.
 
----
+## What happened
 
-## What happened (quick summary)
+- Initial access through a malicious download using certutil
+- Payload execution and persistence established
+- Credentials dumped from LSASS
+- Lateral movement across internal systems
+- Data staged and exfiltrated with rclone to MEGA
 
-- Initial access via malicious download using certutil  
-- Payload execution and persistence established  
-- Credentials dumped from LSASS  
-- Lateral movement across domain systems  
-- Data staged and exfiltrated using rclone to MEGA  
-
-This simulates a full Active Directory compromise from initial access to exfiltration.
-
----
+This threat hunt followed the attack from initial execution through credential theft, lateral movement, persistence, and exfiltration.
 
 ## Attack Overview
 
-High level view of the investigation scope and activity timeline:
+![Attack Overview](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_overview_attack_scope.jpeg)
 
-![Attack Overview](images/TH01_overview_attack_scope.jpeg)
+## Initial Access and Execution
 
----
+Certutil download activity:
 
-## Initial Access + Execution
+![Certutil Download](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_initial_certutil_download.jpeg)
 
-Payload retrieved and executed using built in Windows utilities and suspicious process chains.
+Initial payload execution:
 
-Certutil used to download payload:
-
-![Certutil Download](images/TH01_initial_certutil_download.jpeg)
-
-Payload execution observed:
-
-![Payload Execution](images/TH01_initial_payload_execution.jpeg)
+![Initial Payload Execution](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_initial_payload_execution.jpeg)
 
 Suspicious rundll32 execution chain:
 
-![Rundll32 Execution](images/TH01_exec_rundll32_chain.jpeg)
+![Rundll32 Chain](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_exec_rundll32_chain.jpeg)
 
-Process tree showing abnormal behavior:
+Suspicious process tree tied to execution:
 
-![Process Tree](images/TH01_exec_suspicious_process_tree.jpeg)
-
----
+![Suspicious Process Tree](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_exec_suspicious_process_tree.jpeg)
 
 ## Credential Access
 
-Credential dumping activity identified through LSASS access and memory artifacts.
+LSASS dump evidence:
 
-LSASS dump activity:
-
-![LSASS Dump](images/TH01_cred_lsass_dump.jpeg)
+![LSASS Dump](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_cred_lsass_dump.jpeg)
 
 Sensitive process access tied to credential theft:
 
-![Sensitive Process Access](images/TH01_cred_sensitive_process_access.jpeg)
-
----
+![Sensitive Process Access](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_cred_sensitive_process_access.jpeg)
 
 ## Lateral Movement
 
-Authentication and system access expanded across the environment.
-
 Net use authentication activity:
 
-![Net Use Auth](images/TH01_lat_net_use_auth.jpeg)
+![Net Use Auth](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_lat_net_use_auth.jpeg)
 
-Remote file copy between systems:
+Remote copy between hosts:
 
-![Remote Copy](images/TH01_lat_remote_copy.jpeg)
+![Remote Copy](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_lat_remote_copy.jpeg)
 
-Shared resource access:
+Shared access created for staging and movement:
 
-![Share Access](images/TH01_lat_share_access.jpeg)
+![Share Access](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_lat_share_access.jpeg)
 
----
+## Staging and Exfiltration
 
-## Staging + Exfiltration
+Data preparation before transfer:
 
-Data prepared locally and exfiltrated using external tooling.
+![Stage Data Preparation](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_stage_data_preparation.jpeg)
 
-Data staging and preparation:
+Archive creation before exfiltration:
 
-![Data Prep](images/TH01_stage_data_preparation.jpeg)
+![Stage Archive Creation](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_stage_archive_creation.jpeg)
 
-Archive creation prior to exfiltration:
+Rclone execution:
 
-![Archive Creation](images/TH01_stage_archive_creation.jpeg)
+![Rclone Execution](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_exfil_rclone_execution.jpeg)
 
-Rclone execution for data transfer:
+External MEGA connection evidence:
 
-![Rclone Execution](images/TH01_exfil_rclone_execution.jpeg)
-
-Connection to MEGA infrastructure:
-
-![Mega Connection](images/TH01_exfil_mega_connection.jpeg)
-
----
+![MEGA Connection](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_exfil_mega_connection.jpeg)
 
 ## Persistence
 
-Mechanisms established to maintain access.
+Backdoor account creation:
 
-Account creation for persistence:
+![Account Creation](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_persist_account_creation.jpeg)
 
-![Account Creation](images/TH01_persist_account_creation.jpeg)
+Remote access tool persistence:
 
-Remote access tooling deployed:
+![Remote Access Tool](https://raw.githubusercontent.com/LarkinPetrelles/EmberForge-Threat-Hunt/main/TH01_persist_remote_access_tool.jpeg)
 
-![Remote Access Tool](images/TH01_persist_remote_access_tool.jpeg)
+## Key Takeaways
 
----
+- Confirmed credential dumping from LSASS
+- Confirmed lateral movement across internal systems
+- Confirmed data staging and exfiltration to an external MEGA destination
+- Confirmed persistence through account creation and remote access tooling
 
-## Key Findings
+## Tools Used
 
-- Domain compromise achieved  
-- Credentials successfully extracted from LSASS  
-- Multiple systems accessed through lateral movement  
-- Data exfiltrated to external infrastructure (MEGA)  
-- Persistence established via account creation and remote tooling  
-
-Attack chain reflects common real world adversary behavior across enterprise environments.
-
----
-
-## Tools + Skills Used
-
-- Microsoft Sentinel (KQL)  
-- Log analysis and correlation  
-- Threat hunting methodology  
-- Understanding of attacker TTPs (execution, credential access, lateral movement, exfiltration)  
+- Microsoft Sentinel
+- KQL
+- Threat hunting
+- Process analysis
+- Credential access investigation
+- Lateral movement analysis
+- Exfiltration tracking
