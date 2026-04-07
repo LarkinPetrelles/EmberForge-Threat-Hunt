@@ -145,4 +145,22 @@ Attack behavior closely matches known adversary techniques used in enterprise br
 - Process and command line analysis  
 - Credential access detection  
 - Lateral movement tracking  
-- Data exfiltration analysis  
+- Data exfiltration analysis
+
+---
+
+## Detection Opportunities
+
+- Monitor for certutil usage with external downloads  
+- Alert on LSASS access from non system processes  
+- Detect abnormal use of net use and admin shares  
+- Monitor for rclone or similar tools in command line activity  
+- Track outbound connections to known file sharing services  
+
+## Response Considerations
+
+- Isolate affected systems  
+- Reset compromised credentials  
+- Investigate scope of lateral movement  
+- Block external exfiltration endpoints  
+- Remove persistence mechanisms
