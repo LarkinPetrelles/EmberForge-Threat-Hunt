@@ -6,9 +6,6 @@ Threat hunting investigation conducted in Microsoft Sentinel to identify and tra
 
 ## Experience Context
 
-Log(n) Pacific LLC  
-Role: Cyber Security Support Analyst (Vulnerability Management & SecOps Intern)
-
 This investigation reflects hands on experience applying threat detection and analysis techniques in a SIEM environment. While the scenario is simulated, the workflow mirrors real SecOps responsibilities including log analysis, attack chain reconstruction, and identifying attacker behavior across multiple systems.
 
 The focus was on identifying credential access, tracking lateral movement, detecting data exfiltration, and understanding how attackers maintain persistence within an environment.
